@@ -1,5 +1,7 @@
 import pygame
 
+pygame.init()
+
 #Configuration settings, WIDTH and HEIGHT are the width and height of the GUI
 WIDTH = 600
 HEIGHT = 600
@@ -7,6 +9,7 @@ running = True
 fps = 60
 
 #Creating the necessary pygame objects, screen which is the object to handle the GUI and clock to handle timings and framerate.
+pygame.display.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
@@ -22,7 +25,6 @@ def run():
                 pygame.quit()
     
         #Rendering and rendering function calls go here:
-        pygame.draw.circle(screen, "red", (WIDTH/2, HEIGHT/2), 20)
 
         pygame.display.flip()
 
