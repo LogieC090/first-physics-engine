@@ -7,7 +7,7 @@ Programmed in python and using the pygame library to handle graphics, peripheral
 (Following from the pygame documentation linked: https://www.pygame.org/docs/)
 
 # Features
-- Reccurent step-by-step newtonian physics aimed to run at a constant 60fps.
+- Reccurent step-by-step newtonian physics aimed to run at a constant 60fps. (Have just now found out this is reffered to as semi-implicit Euler)
 - Smooth oblique collisions between spheres.
 - Springs: To follow Hooke's Law.
 - Constant gravitational acceleration.
