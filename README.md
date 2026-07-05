@@ -4,7 +4,7 @@ A simple Newtonian physics engine with springs, particles, collisions and local,
 A post-A-level students attempt to make a physics engine out of pure curiousity.
 
 Programmed in python and using the pygame library to handle graphics, peripheral interrupts and GUI creation. Other than that, done entirely from scratch.
-(Following from the pygame documentation linked: 
+(Following from the pygame documentation linked: https://www.pygame.org/docs/)
 
 # Features
 - Reccurent step-by-step newtonian physics aimed to run at a constant 60fps.
