@@ -1,4 +1,5 @@
 import pygame
+import physics
 
 pygame.init()
 
@@ -18,6 +19,9 @@ def run():
     while running:
         #Redraw the background to clear old images
         screen.fill("black")
+        mousePos = pygame.mouse.get_pos()
+        mouseRect = pygame.rect.Rect(mousePos[0], mousePos[1], 2, 2)
+
 
         #Pygame main event handling loop
         for event in pygame.event.get():
