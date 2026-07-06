@@ -3,8 +3,7 @@ import numpy as np
 particles = []
 springs = []
 e = 0.9
-
-
+g = 9.8
 
 
 def findDistance(pos1, pos2):
@@ -15,13 +14,13 @@ def findDistance(pos1, pos2):
     Dsquared = dx ** 2 + dy ** 2
     return np.sqrt(Dsquared)
 
-
 def getLineOfCentres(pos1, pos2):
     dx = pos1[0] - pos2[0]
     dy = pos1[1] - pos2[1]
     
     I = np.array([dx, dy])
     I = I / np.linalg.norm(I)
+    return I
 
 def obliqueCollision(p1, p2):
     u1 = p1.getVel()
@@ -37,9 +36,14 @@ def obliqueCollision(p1, p2):
 
     v1i = (totalInitialMomentum - (m2 * e * speedOfApproach)) / mT
     v2i = (totalInitialMomentum + (m1 * e * speedOfApproach)) / mT
-    
 
+    u1j = u1 - (u1i * I)
+    u2j = u2 - (u2i * I)
 
+    v1 = v1i + u1j
+    v2 = v2i + u2j
+
+    return v1, v2
 
 def calculateForces():
     for particle1 in particles:
@@ -48,7 +52,10 @@ def calculateForces():
                 r1 = particle1.getRadius()
                 r2 = particle2.getRadius()
                 if findDistance(particle1.getPos(), particle2.getPos()) <= r1 + r2:
-                    v1x, v1y, v2x, v2y = obliqueCollision(particle1, particle2)
+                    v1, v2 = obliqueCollision(particle1, particle2)
+                    particle1.changeVel(v1)
+                    particle2.changeVel(v2)
+        particle1.applyGravity()
 
 
 #Creating the particle claass
@@ -105,9 +112,13 @@ class particle:
         self._velY = vel[1]
         self.setVel()
 
-    def changePos(self, newX, newY):
-        self._x = newX
-        self._y = newY
+    def applyGravity(self):
+        self.velY += g
+        self.setVel()
+
+    def changePos(self, newPos):
+        self._x = newPos[0]
+        self._y = newPos[1]
         self.setPos()
 
     def getSpeed(self):
