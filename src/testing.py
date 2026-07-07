@@ -25,3 +25,8 @@ x, y = returnStuff()
 
 print(x)
 print(y)
+
+
+x = True
+print(x)
+print(not x)

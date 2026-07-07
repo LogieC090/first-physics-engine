@@ -3,7 +3,7 @@ import numpy as np
 particles = []
 springs = []
 e = 0.9
-eFloor = 0.3
+eFloor = 0.5
 g = 9.8
 
 with open("src/data.txt", "r") as file:
@@ -30,7 +30,9 @@ def getLineOfCentres(pos1, pos2):
 
 def obliqueCollision(p1, p2):
     u1 = p1.getVel()
+    u1[1] *= -1
     u2 = p2.getVel()
+    u2[1] *= -1
     m1 = p1.getMass()
     m2 = p2.getMass()
     I = getLineOfCentres(p1.getPos(), p2.getPos())
@@ -54,31 +56,31 @@ def obliqueCollision(p1, p2):
 
 def floorCollision(p1):
     v = p1.getVelY()
+    v*=-1
     v *= eFloor
     p1.changeVelY(v)
-    p1.adjustVelY()
 
 def calculateForces(particle1):
     for particle2 in particles:
         if particle2.getID() != particle1.getID():
             r1 = particle1.getRadius()
             r2 = particle2.getRadius()
-            if findDistance(particle1.getPos(), particle2.getPos()) <= (r1 + r2 + 2):
+            if findDistance(particle1.getPos(), particle2.getPos()) <= (r1 + r2 + 3):
                 v1, v2 = obliqueCollision(particle1, particle2)
                 particle1.changeVel(v1)
-                particle1.adjustVelY()
+                #particle1.adjustVelY()
                 particle2.changeVel(v2)
-                particle2.adjustVelY()
+                #particle2.adjustVelY()
+
     
-    particle1.applyGravity()
     pos = particle1.getPos()
-    if pos[1] >= HEIGHT - (particle1.getRadius() * 2) and particle1.getVelY() > -2:
+    if pos[1] >= HEIGHT - (particle1.getRadius()):
         floorCollision(particle1)
-    elif pos[1] >= HEIGHT - (particle1.getRadius() * 2):
-        particle1.changePosY(HEIGHT - (particle1.getRadius() * 2))
+
 
     newPos = pos + (particle1.getVel() * 0.0167)
     particle1.changePos(newPos)
+    particle1.applyGravity()
 
 
 #Creating the particle claass
@@ -95,10 +97,17 @@ class particle:
         particle._ID += 1
         
         self._radius = radius
+        self._collisionHandled = False
 
         self._velX = 0
         self._velY = 0
         self._vel = np.array([self._velX, self._velY])
+
+    def getCollisionHandled(self):
+        return self._collisionHandled
+    
+    def changeCollisionHandled(self):
+        self._collisionHandled = not self._collisionHandled
 
     def getID(self):
         return self._ID

@@ -19,7 +19,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 radius = 10
-particleSurf = pygame.Surface((radius*5, radius*5), pygame.SRCALPHA)
+particleSurf = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA)
 pygame.draw.circle(particleSurf, 'red', (radius, radius), radius)
 
 
@@ -38,7 +38,8 @@ def run():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                physics.particles.append(physics.particle((mousePos[0] - radius, mousePos[1] - radius), radius, 5))
+                physics.particles.append(physics.particle((mousePos[0], mousePos[1]), radius, 5))
+
     
         #Rendering and rendering function calls go here:
         for particle in physics.particles:
@@ -46,7 +47,7 @@ def run():
             #if particle.getPos()[1] > HEIGHT - (radius * 2):
             #    particle.changePosY(600 - (radius * 2))
             #    particle.changeVelY(0)
-            screen.blit(particleSurf, particle.getPos())
+            screen.blit(particleSurf, (particle.getPos()[0] - radius, particle.getPos()[1] - radius))
 
         pygame.display.flip()
 
