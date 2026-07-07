@@ -29,15 +29,15 @@ def getLineOfCentres(pos1, pos2):
     return I
 
 def obliqueCollision(p1, p2):
-    u1 = p1.getVel()
+    u1 = p1.getVel().copy()
     u1[1] *= -1
-    u2 = p2.getVel()
+    u2 = p2.getVel().copy()
     u2[1] *= -1
     m1 = p1.getMass()
     m2 = p2.getMass()
     I = getLineOfCentres(p1.getPos(), p2.getPos())
-    u1i = np.vecdot(u1, I)
-    u2i = np.vecdot(u2, I)
+    u1i = np.dot(u1, I)
+    u2i = np.dot(u2, I)
     mT = m1 + m2
     totalInitialMomentum = (u1i * m1) + (u2i * m2)
     speedOfApproach = u1i - u2i
