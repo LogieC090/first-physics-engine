@@ -3,8 +3,14 @@ import numpy as np
 particles = []
 springs = []
 e = 0.9
+eFloor = 0.3
 g = 9.8
 
+with open("src/data.txt", "r") as file:
+    data = file.readlines()
+
+WIDTH = int(data[0])
+HEIGHT = int(data[1])
 
 def findDistance(pos1, pos2):
     #Both pos1 and pos2 are expected to be 2D vectors stored as an array
@@ -45,17 +51,34 @@ def obliqueCollision(p1, p2):
 
     return v1, v2
 
-def calculateForces():
-    for particle1 in particles:
-        for particle2 in particles:
-            if particle2.ID != particle1.ID:
-                r1 = particle1.getRadius()
-                r2 = particle2.getRadius()
-                if findDistance(particle1.getPos(), particle2.getPos()) <= r1 + r2:
-                    v1, v2 = obliqueCollision(particle1, particle2)
-                    particle1.changeVel(v1)
-                    particle2.changeVel(v2)
-        particle1.applyGravity()
+
+def floorCollision(p1):
+    v = p1.getVelY()
+    v *= eFloor
+    p1.changeVelY(v)
+    p1.adjustVelY()
+
+def calculateForces(particle1):
+    for particle2 in particles:
+        if particle2.getID() != particle1.getID():
+            r1 = particle1.getRadius()
+            r2 = particle2.getRadius()
+            if findDistance(particle1.getPos(), particle2.getPos()) <= (r1 + r2 + 2):
+                v1, v2 = obliqueCollision(particle1, particle2)
+                particle1.changeVel(v1)
+                particle1.adjustVelY()
+                particle2.changeVel(v2)
+                particle2.adjustVelY()
+    
+    particle1.applyGravity()
+    pos = particle1.getPos()
+    if pos[1] >= HEIGHT - (particle1.getRadius() * 2) and particle1.getVelY() > -2:
+        floorCollision(particle1)
+    elif pos[1] >= HEIGHT - (particle1.getRadius() * 2):
+        particle1.changePosY(HEIGHT - (particle1.getRadius() * 2))
+
+    newPos = pos + (particle1.getVel() * 0.0167)
+    particle1.changePos(newPos)
 
 
 #Creating the particle claass
@@ -66,7 +89,7 @@ class particle:
         self._mass = mass
         self._x = initialPos[0]
         self._y = initialPos[1]
-        self._pos = [self.x, self.y]
+        self._pos = [self._x, self._y]
         self._pos = np.array(self._pos)
         self._ID = particle._ID
         particle._ID += 1
@@ -77,14 +100,18 @@ class particle:
         self._velY = 0
         self._vel = np.array([self._velX, self._velY])
 
-    def getMas(self):
+    def getID(self):
+        return self._ID
+
+    def getMass(self):
         return self._mass
 
     def getRadius(self):
         return self._radius
 
     def setPos(self):
-        self._pos = [self._x, self._y]
+        self._pos[0] = self._x
+        self._pos[1] = self._y
 
     def getPos(self):
         return self._pos
@@ -96,30 +123,44 @@ class particle:
         return self._y
 
     def getVelX(self):
-        return self._velX
+        return self._vel[0]
     
     def getVelY(self):
-        return self._velY
+        return self._vel[1]
     
     def getVel(self):
         return self._vel
     
     def setVel(self):
-        self._vel = np.array([self._velX, self._velY])
+        self._vel[0] = self._velX
+        self._vel[1] = self._velY
 
     def changeVel(self, vel):
         self._velX = vel[0]
         self._velY = vel[1]
         self.setVel()
 
+    def changeVelY(self, newVelY):
+        self._vel[1] = newVelY
+
+    def changeVelX(self, newVelX):
+        self._vel[0] = newVelX
+
+    def adjustVelY(self):
+        self._vel[1] *= -1
+
     def applyGravity(self):
-        self.velY += g
-        self.setVel()
+        self._vel[1] += g
 
     def changePos(self, newPos):
-        self._x = newPos[0]
-        self._y = newPos[1]
-        self.setPos()
+        self._pos[0] = newPos[0]
+        self._pos[1] = newPos[1]
+
+    def changePosY(self, newY):
+        self._pos[1] = newY
+
+    def changePosX(self, newX):
+        self._pos[0] = newX
 
     def getSpeed(self):
         mag = np.linalg.norm(self._vel)

@@ -12,3 +12,16 @@ def getLineOfCentres(pos1, pos2):
 
 
 print(getLineOfCentres([3, 4], [4, 3]))
+
+
+
+def returnStuff():
+    a = 1
+    b = 2
+    return a, b
+
+
+x, y = returnStuff()
+
+print(x)
+print(y)

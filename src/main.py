@@ -4,8 +4,12 @@ import physics
 pygame.init()
 
 #Configuration settings, WIDTH and HEIGHT are the width and height of the GUI
-WIDTH = 600
-HEIGHT = 600
+with open("src\data.txt", "r") as file:
+    data = file.readlines()
+
+WIDTH = int(data[0])
+HEIGHT = int(data[1])
+
 running = True
 fps = 60
 
@@ -14,21 +18,35 @@ pygame.display.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
+radius = 10
+particleSurf = pygame.Surface((radius*5, radius*5), pygame.SRCALPHA)
+pygame.draw.circle(particleSurf, 'red', (radius, radius), radius)
+
+
 #The main loop of the program, all necessary function calls and rendering will take place here.
 def run():
     while running:
         #Redraw the background to clear old images
-        screen.fill("black")
+        screen.fill("dark grey")
+
+        #Track the mouse and create a pygame rect so that it can interact with other pygame rects.
         mousePos = pygame.mouse.get_pos()
         mouseRect = pygame.rect.Rect(mousePos[0], mousePos[1], 2, 2)
-
 
         #Pygame main event handling loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                physics.particles.append(physics.particle((mousePos[0] - radius, mousePos[1] - radius), radius, 5))
     
         #Rendering and rendering function calls go here:
+        for particle in physics.particles:
+            physics.calculateForces(particle)
+            #if particle.getPos()[1] > HEIGHT - (radius * 2):
+            #    particle.changePosY(600 - (radius * 2))
+            #    particle.changeVelY(0)
+            screen.blit(particleSurf, particle.getPos())
 
         pygame.display.flip()
 
