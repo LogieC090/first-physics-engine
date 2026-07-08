@@ -74,15 +74,15 @@ def calculateForces(particle1):
         r2 = particle2.getRadius()
         d = findDistance(particle1.getPos(), particle2.getPos())
         
-        if d <= (r1 + r2 + 5):
+        if d < (r1 + r2 + 5):
             v1, v2 = obliqueCollision(particle1, particle2)
             particle1.changeVel(v1)
             particle2.changeVel(v2)
 
             I = getLineOfCentres(particle1.getPos(), particle2.getPos())
             overlap = (r1 + r2) - d
-            particle1.changePos(particle1.getPos() - I * (overlap / 2))
-            particle2.changePos(particle2.getPos() + I * (overlap / 2))
+            particle1.changePos(particle1.getPos() - (I * (overlap / 2)) + 2.5)
+            particle2.changePos(particle2.getPos() + (I * (overlap / 2)) + 2.5)
     
     pos = particle1.getPos()
     if pos[1] >= HEIGHT - (particle1.getRadius()):
