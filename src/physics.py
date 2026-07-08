@@ -30,9 +30,7 @@ def getLineOfCentres(pos1, pos2):
 
 def obliqueCollision(p1, p2):
     u1 = p1.getVel().copy()
-    u1[1] *= -1
     u2 = p2.getVel().copy()
-    u2[1] *= -1
     m1 = p1.getMass()
     m2 = p2.getMass()
     I = getLineOfCentres(p1.getPos(), p2.getPos())
@@ -48,8 +46,8 @@ def obliqueCollision(p1, p2):
     u1j = u1 - (u1i * I)
     u2j = u2 - (u2i * I)
 
-    v1 = v1i + u1j
-    v2 = v2i + u2j
+    v1 = (v1i * I) + u1j
+    v2 = (v2i * I) + u2j
 
     return v1, v2
 
@@ -61,17 +59,30 @@ def floorCollision(p1):
     p1.changeVelY(v)
 
 def calculateForces(particle1):
+    #for particle2 in particles:
+    #    if particle2.getID() != particle1.getID():
+    #        r1 = particle1.getRadius()
+    #        r2 = particle2.getRadius()
+    #        if findDistance(particle1.getPos(), particle2.getPos()) <= (r1 + r2 + 3):
+    #            v1, v2 = obliqueCollision(particle1, particle2)
+    #            particle1.changeVel(v1)
+    #            particle2.changeVel(v2)
     for particle2 in particles:
-        if particle2.getID() != particle1.getID():
-            r1 = particle1.getRadius()
-            r2 = particle2.getRadius()
-            if findDistance(particle1.getPos(), particle2.getPos()) <= (r1 + r2 + 3):
-                v1, v2 = obliqueCollision(particle1, particle2)
-                particle1.changeVel(v1)
-                #particle1.adjustVelY()
-                particle2.changeVel(v2)
-                #particle2.adjustVelY()
+        if particle2.getID() <= particle1.getID():
+            continue
+        r1 = particle1.getRadius()
+        r2 = particle2.getRadius()
+        d = findDistance(particle1.getPos(), particle2.getPos())
+        
+        if d <= (r1 + r2 + 5):
+            v1, v2 = obliqueCollision(particle1, particle2)
+            particle1.changeVel(v1)
+            particle2.changeVel(v2)
 
+            I = getLineOfCentres(particle1.getPos(), particle2.getPos())
+            overlap = (r1 + r2) - d
+            particle1.changePos(particle1.getPos() - I * (overlap / 2))
+            particle2.changePos(particle2.getPos() + I * (overlap / 2))
     
     pos = particle1.getPos()
     if pos[1] >= HEIGHT - (particle1.getRadius()):
