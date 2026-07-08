@@ -3,7 +3,7 @@ import numpy as np
 particles = []
 springs = []
 e = 0.9
-eFloor = 0.5
+eFloor = 0.3
 g = 9.8
 
 with open("src/data.txt", "r") as file:
@@ -11,6 +11,7 @@ with open("src/data.txt", "r") as file:
 
 WIDTH = int(data[0])
 HEIGHT = int(data[1])
+fps = int(data[2])
 
 def findDistance(pos1, pos2):
     #Both pos1 and pos2 are expected to be 2D vectors stored as an array
@@ -55,8 +56,14 @@ def obliqueCollision(p1, p2):
 def floorCollision(p1):
     v = p1.getVelY()
     v*=-1
-    v *= eFloor
+    v *= p1.getFloorCoefficient()
     p1.changeVelY(v)
+
+def wallCollision(p1):
+    v = p1.getVelX()
+    v *= -1
+    v *= p1.getFloorCoefficient()
+    p1.changeVelX(v)
 
 def calculateForces(particle1):
     #for particle2 in particles:
@@ -74,22 +81,27 @@ def calculateForces(particle1):
         r2 = particle2.getRadius()
         d = findDistance(particle1.getPos(), particle2.getPos())
         
-        if d < (r1 + r2 + 5):
+        if d < (r1 + r2 + 1):
             v1, v2 = obliqueCollision(particle1, particle2)
             particle1.changeVel(v1)
             particle2.changeVel(v2)
 
             I = getLineOfCentres(particle1.getPos(), particle2.getPos())
             overlap = (r1 + r2) - d
-            particle1.changePos(particle1.getPos() - (I * (overlap / 2)) + 2.5)
-            particle2.changePos(particle2.getPos() + (I * (overlap / 2)) + 2.5)
+            particle1.changePos(particle1.getPos() - (I * (overlap / 2)) + 0.5)
+            particle2.changePos(particle2.getPos() + (I * (overlap / 2)) + 0.5)
     
     pos = particle1.getPos()
     if pos[1] >= HEIGHT - (particle1.getRadius()):
         floorCollision(particle1)
+        #particle1.updateFloorCoefficient()
+        #particle1.changePosY(HEIGHT - particle1.getRadius() - 1)
+
+    if pos[0] >= WIDTH - (particle1.getRadius()) or pos[0] <= 0 + particle1.getRadius():
+        wallCollision(particle1)
 
 
-    newPos = pos + (particle1.getVel() * 0.0167)
+    newPos = pos + (particle1.getVel() * (1 / fps))
     particle1.changePos(newPos)
     particle1.applyGravity()
 
@@ -110,9 +122,18 @@ class particle:
         self._radius = radius
         self._collisionHandled = False
 
+        self.floorCoefficient = eFloor
+
         self._velX = 0
         self._velY = 0
         self._vel = np.array([self._velX, self._velY])
+
+    def getFloorCoefficient(self):
+        return self.floorCoefficient
+    
+    def updateFloorCoefficient(self):
+        if self.floorCoefficient > 0.1:
+            self.floorCoefficient -= 0.1
 
     def getCollisionHandled(self):
         return self._collisionHandled

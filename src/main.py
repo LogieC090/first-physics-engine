@@ -11,7 +11,7 @@ WIDTH = int(data[0])
 HEIGHT = int(data[1])
 
 running = True
-fps = 60
+fps = int(data[2])
 
 #Creating the necessary pygame objects, screen which is the object to handle the GUI and clock to handle timings and framerate.
 pygame.display.init()
