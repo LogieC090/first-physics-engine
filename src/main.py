@@ -44,9 +44,6 @@ def run():
         #Rendering and rendering function calls go here:
         for particle in physics.particles:
             physics.calculateForces(particle)
-            #if particle.getPos()[1] > HEIGHT - (radius * 2):
-            #    particle.changePosY(600 - (radius * 2))
-            #    particle.changeVelY(0)
             screen.blit(particleSurf, (particle.getPos()[0] - radius, particle.getPos()[1] - radius))
 
         pygame.display.flip()
